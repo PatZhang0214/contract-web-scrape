@@ -18,30 +18,8 @@ driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), opti
 # driver = webdriver.Chrome(executable_path='path/to/chromedriver')
 
 # Navigate to the website
-driver.get('https://www.merx.com/public/solicitations/open?keywords=thermal&publishDate=&solSearchStatus=openSolicitationsTab&sortBy=&sortDirection=')
 # Example: Extract some data
 title = driver.title
-# h1 = driver.find_elements("class name", 'rowTitle')
-# links = driver.find_elements("class name", "mets-command-link")
-# print(f'Title of the page: {title}')
-
-# for i in h1:
-#     print(i.text)
-
-# for i in links:
-#     if(i.get_attribute('href').__contains__("https://www.merx.com/public/supplier/interception/")):
-#         print(i.get_attribute('href'))
-
-# try:
-#     link = driver.find_element(By.CLASS_NAME, "next")
-#     driver.execute_script("arguments[0].scrollIntoView();", link)
-#     link.click()
-#     print("Clicked on the link successfully.")
-# except Exception as e:
-#     print(f'Error: {e}')
-
-# Close the driver
-# time.sleep(10)
 
 def constructParsedInformation(d: dict):
     openTitles = getOpens()
@@ -70,13 +48,13 @@ def getLinks():
     print("\nThere are " + str(len(links)) + " links")
     return links
 
-if __name__ == "__main__":
+def getAllLinks():
     parsedDict = {}
     constructParsedInformation(parsedDict)
     print(parsedDict)
     while len(driver.find_elements(By.CLASS_NAME, "next")) > 0:
         try:
-            time.sleep(3)
+            time.sleep(1)
             link = driver.find_element(By.CLASS_NAME, "next")
             driver.execute_script("arguments[0].scrollIntoView();", link)
             link.click()
@@ -85,8 +63,19 @@ if __name__ == "__main__":
         except Exception as e:
             print(f'Error: {e}')
             break
-    time.sleep(2)
-    driver.quit()
+    time.sleep(1)
     print(parsedDict)
+    return parsedDict
 
+def getAllParsedInfo(keywords: list[str]):
+    parsedDicts = {}
+    for keyword in keywords:
+        driver.get("https://www.merx.com/public/solicitations/open?keywords="+keyword+"&publishDate=&solSearchStatus=openSolicitationsTab&sortBy=&sortDirection=")
+        parsedDicts[keyword] = getAllLinks()
 
+    print(parsedDicts)
+    driver.quit()
+    return parsedDicts
+
+if __name__ == "__main__":
+    getAllParsedInfo()
