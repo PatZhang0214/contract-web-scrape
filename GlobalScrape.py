@@ -42,67 +42,41 @@ def getLink():
     print(links)
     return links
 
-# def fetchContractsOnPage(keywords: list[str]):
+def fetchContractsOnPage(keywords: list[str], parsedDict: dict):
+    links = getLink()
+    titles = getTitle()
+    try:
+        for i in range(len(titles)):
+            for keyword in keywords:
+                if titles[i].upper() in keyword.upper():
+                    itemTuple = (titles[i], links[i])
+                    parsedDict[keyword].append(itemTuple)
+    except Exception as e:
+        print(e)
 
-
-# def fetchContracts(keywords: list[str]):
-
-# def constructParsedInformation(d: dict):
-#     openTitles = getOpens()
-#     links = getLinks()
-#     try:
-#         for i in range(len(openTitles)):
-#             d[openTitles[i]] = links[i]
-#     except Exception as e:
-#         print("\nError")
-
-# def getOpens():
-#     titles = []
-#     h1 = driver.find_elements("class name", 'rowTitle')
-#     for i in h1:
-#         titles.append(i.text)
-#     print("\nThere are " + str(len(titles)) + " opens")
-#     return titles
-
-# def getLinks():
-#     links = []
-#     l = driver.find_elements("class name", "mets-table-row")
-#     for tr in l:
-#         aTag = tr.find_elements("tag name", "a")
-#         links.append(aTag[0].get_attribute('href'))
-#         print(aTag[0].get_attribute('href'))
-#     print("\nThere are " + str(len(links)) + " links")
-#     return links
-
-# def getAllLinks():
-#     parsedDict = {}
-#     constructParsedInformation(parsedDict)
-#     print(parsedDict)
-#     while len(driver.find_elements(By.CLASS_NAME, "next")) > 0:
-#         try:
-#             time.sleep(1)
-#             link = driver.find_element(By.CLASS_NAME, "next")
-#             driver.execute_script("arguments[0].scrollIntoView();", link)
-#             link.click()
-#             constructParsedInformation(parsedDict)
-#             print("Clicked on the link successfully.")
-#         except Exception as e:
-#             print(f'Error: {e}')
-#             break
-#     time.sleep(1)
-#     print(parsedDict)
-#     return parsedDict
-
-# def getAllParsedInfo(keywords: list[str]):
-#     parsedDicts = {}
-#     for keyword in keywords:
-#         driver.get("https://www.merx.com/public/solicitations/open?keywords="+keyword+"&publishDate=&solSearchStatus=openSolicitationsTab&sortBy=&sortDirection=")
-#         parsedDicts[keyword] = getAllLinks()
-
-#     print(parsedDicts)
-#     driver.quit()
-#     return parsedDicts
+def fetchContracts(keywords: list[str]):
+    parsedDict = {}
+    fetchContractsOnPage(keywords, parsedDict)
+    title = 20
+    while len(driver.find_elements(By.CSS_SELECTOR, "div[class='tender-wrap']")) > 0:
+        try:
+            time.sleep(1)
+            link = driver.find_element(By.CSS_SELECTOR, "a[title='"+str(title)+"']")
+            driver.execute_script("arguments[0].click();", link)
+            time.sleep(4)
+            fetchContractsOnPage(keywords, parsedDict)
+            print("Clicked on the link successfully.")
+            title += 20
+        except Exception as e:
+            print(f'Error: {e}')
+            break
+    print(parsedDict)
+    time.sleep(1)
+    driver.close()
 
 if __name__ == "__main__":
-    getTitle()
-    getLink()
+    keywords = ["Drones", "UAV", "UAVs", "RPA", "RPAS", "Remotely Piloted Aircraft Systems",
+                "EVTOL", "VTOL", "Electric Fixed-wing Aircraft", "Heavy-lift Drones", "DJI",
+                  "Dajiang Industries", "Mavic 3", "Matrice 350", "M3E", "M3M", "M30", "M30T",
+                    "M350", "Multispectral", "Thermal", "Night Vision"]
+    fetchContracts(keywords)
