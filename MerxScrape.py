@@ -11,7 +11,7 @@ import time
 
 # Set up Chrome options
 chrome_options = Options()
-# chrome_options.add_argument("--headless")  # Enable headless mode
+chrome_options.add_argument("--headless")  # Enable headless mode
 
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 # or specify the path directly

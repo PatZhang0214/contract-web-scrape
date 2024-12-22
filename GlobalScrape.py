@@ -17,7 +17,6 @@ driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), opti
 # or specify the path directly
 # driver = webdriver.Chrome(executable_path='path/to/chromedriver')
 
-driver.get("https://www.globaltenders.com/government-tenders-canada#tenderPagination")
 # Navigate to the website
 # Example: Extract some data
 title = driver.title
@@ -55,6 +54,7 @@ def fetchContractsOnPage(keywords: list[str], parsedDict: dict):
         print(e)
 
 def fetchContracts(keywords: list[str]):
+    driver.get("https://www.globaltenders.com/government-tenders-canada#tenderPagination")
     parsedDict = {}
     fetchContractsOnPage(keywords, parsedDict)
     title = 20
@@ -70,9 +70,8 @@ def fetchContracts(keywords: list[str]):
         except Exception as e:
             print(f'Error: {e}')
             break
-    print(parsedDict)
-    time.sleep(1)
     driver.close()
+    return parsedDict
 
 if __name__ == "__main__":
     keywords = ["Drones", "UAV", "UAVs", "RPA", "RPAS", "Remotely Piloted Aircraft Systems",

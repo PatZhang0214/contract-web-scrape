@@ -12,7 +12,7 @@ import time
 
 # Set up Chrome options
 chrome_options = Options()
-# chrome_options.add_argument("--headless")  # Enable headless mode
+chrome_options.add_argument("--headless")  # Enable headless mode
 
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 # or specify the path directly
@@ -27,7 +27,7 @@ def changePage(keyword: str):
     link.clear()
     link.send_keys(keyword)
     link.send_keys(Keys.RETURN)
-    time.sleep(4)
+    time.sleep(2)
 
 def forwardPage():
     nextPage = driver.find_element(By.CSS_SELECTOR, "button[aria-label='Next page']")
@@ -36,7 +36,7 @@ def forwardPage():
     if attr is None:
         driver.execute_script("arguments[0].scrollIntoView();", nextPage)
         print("Scrolling")
-        time.sleep(3)
+        time.sleep(1)
         nextPage.click()
         return True
     else:
@@ -51,7 +51,7 @@ def scrapePage():
             links.append(rl.text)
     print(links)
     forwarded = forwardPage()
-    time.sleep(4)
+    time.sleep(2)
     print(forwarded)
     return links
 
@@ -63,18 +63,22 @@ def scrapeTerm(keyword: str, parsedDict: dict):
         parsedDict[keyword].extend(scrapePage())
     print(parsedDict)
 
-def scrapeAllTerms(keywords: list[str], parsedDict: dict):
+def scrapeAllTerms(keywords: list[str]):
+    driver.get("https://www.biddingo.com/search?k=")
+    parsedDict = {}
     for keyword in keywords:
         scrapeTerm(keyword, parsedDict)
     print(parsedDict)
+    driver.close()
+    return parsedDict
 
 if __name__ == "__main__":
+    keywords = ["Drones", "UAV", "UAVs", "RPA", "RPAS", "Remotely Piloted Aircraft Systems",
+                "EVTOL", "VTOL", "Electric Fixed-wing Aircraft", "Heavy-lift Drones", "DJI",
+                  "Dajiang Industries", "Mavic 3", "Matrice 350", "M3E", "M3M", "M30", "M30T",
+                    "M350", "Multispectral", "Thermal", "Night Vision"]
     # keywords = ["Drones", "UAV", "UAVs", "RPA", "RPAS", "Remotely Piloted Aircraft Systems",
-    #             "EVTOL", "VTOL", "Electric Fixed-wing Aircraft", "Heavy-lift Drones", "DJI",
-    #               "Dajiang Industries", "Mavic 3", "Matrice 350", "M3E", "M3M", "M30", "M30T",
-    #                 "M350", "Multispectral", "Thermal", "Night Vision"]
-    keywords = ["truck"]
-    driver.get("https://www.biddingo.com/search?k=")
-    parsedDict = {}
-    scrapeAllTerms(keywords, parsedDict)
+    #             "EVTOL", "VTOL", "Electric Fixed-wing Aircraft"]
+    # keywords = ["truck"]
+    parsed = scrapeAllTerms(keywords)
 
